@@ -32,6 +32,12 @@ Route::group(['prefix' => 'q'], function() {
     Route::get('popular', 'QuoteController@showPopular');
 
     Route::get('create', 'QuoteController@create');
-    
+
     Route::post('auth/post', 'QuoteController@store');
+
 });
+
+Route::group(['prefix' => 'irtbot'], function() {
+    Route::post('post/{token}', 'QuoteController@store');
+});
+

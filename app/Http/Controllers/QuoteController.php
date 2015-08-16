@@ -38,18 +38,33 @@ class QuoteController extends Controller
      */
     public function store(Request $r)
     {
+
         $this->validate($r, [
             'body' => 'required|min:10|max:1200',
             'notes' => 'string',
         ]);
+
         $quote = new Quote;
         $quote->body = nl2br(htmlentities($r->input('body'), ENT_QUOTES, 'UTF-8'));
         $quote->body_hash = hash('sha512', $quote->body);
         $quote->notes = (!empty($r->input('notes'))) ? e($r->input('notes')) : null;
         $quote->author_addr = $r->ip();
-        $quote->save();
 
-        return redirect('/q/view/'.$quote->id);
+        if ($r->input('irtbot')) {
+            if ($r->input('irtbot') == env('IRTBOT_TOKEN', false)) {
+
+                $quote->save();
+                return json_encode([ 'id' => $quote->id ]);
+
+            } else {
+                return view('quote.new');
+            }
+
+        } else {
+
+            $quote->save();
+            return redirect('/q/view/'.$quote->id);
+        }
     }
 
     /**
